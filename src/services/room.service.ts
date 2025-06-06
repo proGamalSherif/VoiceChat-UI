@@ -43,7 +43,7 @@ export class RoomService {
     return this.httpClient.post(`${this.apiUrl}/RoomChat`, entity);
   }
   InsertEntityConnection(entity: FormData): Observable<any> {
-    return this.httpClient.post(`${this.apiUrl}/UserConnection`, entity);
+    return this.httpClient.post(`${this.apiUrl}/UserStatus`,entity);
   }
   // طرق جديدة للدردشة
   public joinRoom(roomId: number): Promise<void> {
