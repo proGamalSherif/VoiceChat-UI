@@ -155,7 +155,7 @@ export class ChatComponent implements OnInit {
   async initiateCall(receiverId: string): Promise<void> {
     this.selectedUserId = receiverId;
     this.activeCallUserId = receiverId;
-    this.signalRAudio.startCall(receiverId, this.loggedUserId);
+    this.signalRAudio.startCall(receiverId, this.loggedUserId,this.RoomId);
     await this.startCall(true);
   }
   private async startCall(isCaller: boolean): Promise<void> {
