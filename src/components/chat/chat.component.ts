@@ -163,14 +163,17 @@ export class ChatComponent implements OnInit {
       if (this.peerConnection) {
         this.peerConnection.close();
       }
+
       this.peerConnection = new RTCPeerConnection({
         iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
       });
-      const audioContext = new AudioContext();
-      const echoCancellation = {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
+      const audioConstraints: MediaTrackConstraints = {
+        echoCancellation: { exact: true },
+        noiseSuppression: { exact: true },
+        autoGainControl: { exact: true },
+        channelCount: 1,
+        sampleRate: 16000,
+        sampleSize: 16,
       };
       this.peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
@@ -190,10 +193,12 @@ export class ChatComponent implements OnInit {
         this.remoteStream.addTrack(event.track);
       };
 
-      this.localStream = await navigator.mediaDevices.getUserMedia({
-      audio: echoCancellation,
-      video: false
-    });
+      this.localStream = await this.applyAudioProcessing(
+        await navigator.mediaDevices.getUserMedia({
+          audio: audioConstraints,
+          video: false,
+        })
+      );
       this.localStream.getTracks().forEach((track) => {
         this.peerConnection.addTrack(track, this.localStream);
       });
@@ -235,6 +240,24 @@ export class ChatComponent implements OnInit {
     }
     if (this.remoteAudio) {
       this.remoteAudio.nativeElement.srcObject = null;
+    }
+  }
+  private async applyAudioProcessing(
+    stream: MediaStream
+  ): Promise<MediaStream> {
+    try {
+      const audioContext = new (window.AudioContext ||
+        (window as any).webkitAudioContext)();
+      const source = audioContext.createMediaStreamSource(stream);
+      const destination = audioContext.createMediaStreamDestination();
+      const gainNode = audioContext.createGain();
+      gainNode.gain.value = 0.8;
+      source.connect(gainNode);
+      gainNode.connect(destination);
+      return new MediaStream([destination.stream.getAudioTracks()[0]]);
+    } catch (error) {
+      console.error('Error applying audio processing:', error);
+      return stream;
     }
   }
 }
