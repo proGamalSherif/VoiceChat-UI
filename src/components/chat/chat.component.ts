@@ -160,15 +160,18 @@ export class ChatComponent implements OnInit {
   }
   private async startCall(isCaller: boolean): Promise<void> {
     try {
-      this.peerConnection = new RTCPeerConnection();
-
       if (this.peerConnection) {
         this.peerConnection.close();
       }
       this.peerConnection = new RTCPeerConnection({
         iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
       });
-
+      const audioContext = new AudioContext();
+      const echoCancellation = {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+      };
       this.peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
           this.signalRAudio.sendIceCandidate(
@@ -188,8 +191,9 @@ export class ChatComponent implements OnInit {
       };
 
       this.localStream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-      });
+      audio: echoCancellation,
+      video: false
+    });
       this.localStream.getTracks().forEach((track) => {
         this.peerConnection.addTrack(track, this.localStream);
       });
