@@ -7,15 +7,15 @@ import { IInsertRoomChatDTO } from '../models/iinsert-room-chat-dto';
 import { IRoomChat } from '../models/iroom-chat';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RoomService {
   private apiUrl = environment.apiUrl;
-  
+
   constructor(
     private httpClient: HttpClient,
     private signalRService: SignalRService
-  ) { 
+  ) {
     this.signalRService.startConnection();
   }
 
@@ -39,16 +39,20 @@ export class RoomService {
     );
   }
 
-   PostNewMessage(entity: FormData): Observable<any> {
+  PostNewMessage(entity: FormData): Observable<any> {
     return this.httpClient.post(`${this.apiUrl}/RoomChat`, entity);
   }
-
+  InsertEntityConnection(entity: FormData): Observable<any> {
+    return this.httpClient.post(`${this.apiUrl}/UserConnection`, entity);
+  }
   // طرق جديدة للدردشة
   public joinRoom(roomId: number): Promise<void> {
     return this.signalRService.joinRoom(roomId);
   }
 
-  public async sendChatMessage(message: IInsertRoomChatDTO): Promise<IRoomChat> {
+  public async sendChatMessage(
+    message: IInsertRoomChatDTO
+  ): Promise<IRoomChat> {
     return this.signalRService.sendMessage(message);
   }
 

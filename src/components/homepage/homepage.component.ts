@@ -49,7 +49,14 @@ export class HomepageComponent implements AfterViewInit,OnDestroy {
   onRoomIdChanged(id: number): void {
     this.selectedRoomId=-1;
     setTimeout(() => {
-      this.selectedRoomId = id;
+      const roomEntity = new FormData();
+      roomEntity.append('userId',this.CurrentUserId??'');
+      roomEntity.append('roomId',id.toString());
+      this.roomService.InsertEntityConnection(roomEntity).subscribe({
+        next:()=>{
+          this.selectedRoomId = id;
+        }
+      })
     }, 500);
     
   }
