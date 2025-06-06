@@ -1,0 +1,47 @@
+<div class="d-flex align-items-start justify-content-center border rounded shadow-sm pt-5 pb-5"
+  style="height: 100vh;width: 100%;">
+  <!-- Sidebar -->
+  <div class="row h-100 col-2">
+    <div class="d-flex flex-column align-items-center justify-content-start ps-2">
+      <div class="row col-12 border-bottom mb-3">
+        <h2 class="text-center mb-1 fs-4">Rooms Dashboard</h2>
+      </div>
+      <div class="row col-12 border-bottom mb-3">
+        <div class="flex-column col-6 mb-3 h-100">
+          @if(!CurrentUserId){
+          <button class="btn btn-outline-primary col-12 mb-1" (click)="ConfirmUsername()">
+            Login
+          </button>
+          }@else {
+          <button class="btn btn-outline-danger col-12" (click)="ConfirmLogout()">
+            Logout
+          </button>
+          }
+
+        </div>
+        <div class="flex-column col-6 mb-3">
+          @if (CurrentUserId) {
+          <button class="btn btn-outline-secondary col-12 mb-1" (click)="ConfirmCreateRoom()">
+            New Room
+          </button>
+          <button class="btn btn-outline-success col-12" (click)="ConfirmJoinRoom()">
+            Join Room
+          </button>
+          }
+        </div>
+      </div>
+      <div class="row col-12 border-bottom mb-3" style="height: 70vh;overflow-y: auto;">
+        <div class="d-flex align-items-start justify-content-center">
+          <app-rooms (roomId)="onRoomIdChanged($event)"></app-rooms>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row h-100 col-10 ps-3">
+    <div class="border">
+      @if (selectedRoomId && selectedRoomId > 0) {
+      <app-chat [RoomId]="selectedRoomId"></app-chat>
+      }
+    </div>
+  </div>
+</div>

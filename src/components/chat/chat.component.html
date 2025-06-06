@@ -1,0 +1,80 @@
+<div class="d-flex flex-column align-items-center justify-content-center">
+  @if (RoomEntity) {
+  <div class="row col-12">
+    <div class="border-bottom shadow-sm" style="height: 80px;">
+      <div class="h-100 d-flex flex-column align-items-start justify-content-center">
+        <span class="mt-4 text-primary">{{RoomEntity.roomId}}</span>
+        <span class="fs-5">{{RoomEntity.roomName}}
+          <div style="display: inline;" (click)="ShowOnlineUsers()"> <span class="online-users"
+              *ngIf="UsersOnline">({{UsersOnline}} Online)</span></div>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex flex-column w-100 mt-2" style="height: 73vh; overflow-y: auto;">
+    @for (msg of RoomEntity.roomChats; track msg.chatId) {
+    <div class="d-flex mb-2" [ngClass]="msg.userId === LoggedUser ? 'justify-content-end' : 'justify-content-start'">
+      <div class="message-box p-2 rounded shadow-sm"
+        [ngClass]="msg.userId === LoggedUser ? 'bg-primary text-white text-end' : 'bg-light text-dark text-start'"
+        style="max-width: 70%;">
+        <div class="small fw-bold">
+          {{ msg.createdIn | formatDateTime }}
+        </div>
+        <div class="small fw-bold">
+          {{ msg.username }}
+        </div>
+        <div>{{ msg.chatMessage }}</div>
+      </div>
+    </div>
+    }
+  </div>
+  <div class="d-flex row col-12">
+    <div class="flex-column col-11">
+      <textarea #inputMessage class="form-control" rows="2" style="resize: none;"></textarea>
+    </div>
+    <div class="d-flex flex-column col-1 align-items-center justify-content-center">
+      <button class="btn btn-outline-dark w-100 h-100" (click)="onSubmit()">Send</button>
+    </div>
+  </div>
+  }
+</div>
+
+
+
+
+
+
+<!-- Modal -->
+<div #modalElement class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Online Users</h5>
+      </div>
+      <div class="modal-body">
+        @if (UsersOnlineArr) {
+        @for (user of UsersOnlineArr; track user.id) {
+        @if(user.userId !== LoggedUser){
+        <div class="d-flex align-items-center justify-content-center border rounded" style="height: 45px;">
+          <div class="flex-column col-auto me-3">
+            {{user.username}}
+          </div>
+          <div class="flex-column col-auto">
+            <button *ngIf="activeCallUserId !== user.userId" class="btn btn-outline-success"
+              (click)="initiateCall(user.userId)">
+              Call
+            </button>
+
+            <button *ngIf="activeCallUserId === user.userId" class="btn btn-outline-danger" (click)="endCall()">
+              End Call
+            </button>
+          </div>
+        </div>
+        <audio #remoteAudio autoplay></audio>
+        }
+        }
+        }
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,23 @@
+<div class="row col-12 mb-3">
+  <div class="d-flex align-items-center justify-content-end">
+    <button class="btn btn-success" (click)="refreshRooms()">
+      <i class="fas fa-sync-alt"></i>
+    </button>
+  </div>
+</div>
+<div class="row col-12 d-flex align-items-center justify-content-center">
+  @for (room of RoomArr; track room.roomId) {
+  <div class="row col-12 border rounded shadow-sm mb-2 room-container" style="height: 60px;width: 270px !important;" (click)="sendRoomIdToParent(room.roomId)">
+    <div class="d-flex align-items-center justify-content-center">
+      <div class="flex-column col-2">
+        <i class="fas fa-layer-group fa-lg"></i>
+      </div>
+      <div class="flex-column col-10">
+        <div class="row col-12">
+          <span class="fs-5">{{room.roomName}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>

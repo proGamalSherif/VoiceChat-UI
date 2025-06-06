@@ -1,0 +1,15 @@
+.single-line-message {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.room-container {
+  transition: all 0.25s ease-in-out;
+}
+
+.room-container:hover {
+  cursor: pointer;
+  transform: scale(1.05);
+}
