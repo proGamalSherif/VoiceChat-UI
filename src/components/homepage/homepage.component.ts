@@ -52,6 +52,7 @@ export class HomepageComponent implements AfterViewInit,OnDestroy {
       const roomEntity = new FormData();
       roomEntity.append('userId',this.CurrentUserId??'');
       roomEntity.append('roomId',id.toString());
+      roomEntity.append('isLogged','true');
       this.roomService.InsertEntityConnection(roomEntity).subscribe({
         next:()=>{
           this.selectedRoomId = id;
