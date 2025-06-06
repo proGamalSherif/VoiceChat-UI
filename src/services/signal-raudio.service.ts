@@ -28,15 +28,21 @@ export class SignalRAudioService {
     this.hubConnection.on('ReceiveCall', callback);
   }
 
-  public onReceiveOffer(callback: (senderId: string, offer: any) => void): void {
+  public onReceiveOffer(
+    callback: (senderId: string, offer: any) => void
+  ): void {
     this.hubConnection.on('ReceiveOffer', callback);
   }
 
-  public onReceiveAnswer(callback: (senderId: string, answer: any) => void): void {
+  public onReceiveAnswer(
+    callback: (senderId: string, answer: any) => void
+  ): void {
     this.hubConnection.on('ReceiveAnswer', callback);
   }
 
-  public onReceiveIceCandidate(callback: (senderId: string, candidate: any) => void): void {
+  public onReceiveIceCandidate(
+    callback: (senderId: string, candidate: any) => void
+  ): void {
     this.hubConnection.on('ReceiveIceCandidate', callback);
   }
 
@@ -48,19 +54,48 @@ export class SignalRAudioService {
     return this.hubConnection.invoke('StartCall', receiverId, callerId);
   }
 
-  public sendOffer(receiverId: string, senderId: string, offer: any): Promise<void> {
+  public sendOffer(
+    receiverId: string,
+    senderId: string,
+    offer: any
+  ): Promise<void> {
     return this.hubConnection.invoke('SendOffer', receiverId, senderId, offer);
   }
 
-  public sendAnswer(receiverId: string, senderId: string, answer: any): Promise<void> {
-    return this.hubConnection.invoke('SendAnswer', receiverId, senderId, answer);
+  public sendAnswer(
+    receiverId: string,
+    senderId: string,
+    answer: any
+  ): Promise<void> {
+    return this.hubConnection.invoke(
+      'SendAnswer',
+      receiverId,
+      senderId,
+      answer
+    );
   }
 
-  public sendIceCandidate(receiverId: string, senderId: string, candidate: any): Promise<void> {
-    return this.hubConnection.invoke('SendIceCandidate', receiverId, senderId, candidate);
+  public sendIceCandidate(
+    receiverId: string,
+    senderId: string,
+    candidate: any
+  ): Promise<void> {
+    return this.hubConnection.invoke(
+      'SendIceCandidate',
+      receiverId,
+      senderId,
+      candidate
+    );
   }
 
   public endVoiceCall(receiverId: string, senderId: string): Promise<void> {
     return this.hubConnection.invoke('EndCall', receiverId, senderId);
+  }
+  public disconnect(): void {
+    if (this.hubConnection) {
+      this.hubConnection.stop().then(() => {
+        console.log('SignalR connection stopped');
+      });
+    }
   }
 }

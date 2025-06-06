@@ -154,50 +154,83 @@ export class ChatComponent implements OnInit {
   }
   async initiateCall(receiverId: string): Promise<void> {
     this.selectedUserId = receiverId;
+    this.activeCallUserId = receiverId;
     this.signalRAudio.startCall(receiverId, this.loggedUserId);
     await this.startCall(true);
   }
   private async startCall(isCaller: boolean): Promise<void> {
-    this.peerConnection = new RTCPeerConnection();
+    try {
+      this.peerConnection = new RTCPeerConnection();
 
-    this.peerConnection.onicecandidate = (event) => {
-      if (event.candidate) {
-        this.signalRAudio.sendIceCandidate(
+      if (this.peerConnection) {
+        this.peerConnection.close();
+      }
+      this.peerConnection = new RTCPeerConnection({
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+      });
+
+      this.peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+          this.signalRAudio.sendIceCandidate(
+            this.selectedUserId,
+            this.loggedUserId,
+            event.candidate
+          );
+        }
+      };
+
+      this.peerConnection.ontrack = (event) => {
+        if (!this.remoteStream) {
+          this.remoteStream = new MediaStream();
+          this.remoteAudio.nativeElement.srcObject = this.remoteStream;
+        }
+        this.remoteStream.addTrack(event.track);
+      };
+
+      this.localStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+      this.localStream.getTracks().forEach((track) => {
+        this.peerConnection.addTrack(track, this.localStream);
+      });
+      this.localAudio.nativeElement.srcObject = this.localStream;
+
+      if (isCaller) {
+        const offer = await this.peerConnection.createOffer();
+        await this.peerConnection.setLocalDescription(offer);
+        this.signalRAudio.sendOffer(
           this.selectedUserId,
           this.loggedUserId,
-          event.candidate
+          offer
         );
       }
-    };
-
-    this.peerConnection.ontrack = (event) => {
-      if (!this.remoteStream) {
-        this.remoteStream = new MediaStream();
-        this.remoteAudio.nativeElement.srcObject = this.remoteStream;
-      }
-      this.remoteStream.addTrack(event.track);
-    };
-
-    this.localStream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
-    });
-    this.localStream.getTracks().forEach((track) => {
-      this.peerConnection.addTrack(track, this.localStream);
-    });
-    this.localAudio.nativeElement.srcObject = this.localStream;
-
-    if (isCaller) {
-      const offer = await this.peerConnection.createOffer();
-      await this.peerConnection.setLocalDescription(offer);
-      this.signalRAudio.sendOffer(
-        this.selectedUserId,
-        this.loggedUserId,
-        offer
-      );
+    } catch (error) {
+      console.log(error);
     }
   }
   endCall() {
-  this.signalRAudio.endVoiceCall(this.loggedUserId,this.selectedUserId);
-  this.activeCallUserId = null;
-}
+    if (this.peerConnection) {
+      this.peerConnection.close();
+    }
+
+    if (this.localStream) {
+      this.localStream.getTracks().forEach((track) => track.stop());
+    }
+
+    if (this.remoteStream) {
+      this.remoteStream.getTracks().forEach((track) => track.stop());
+    }
+
+    this.signalRAudio.endVoiceCall(this.selectedUserId, this.loggedUserId);
+    this.activeCallUserId = null;
+    this.selectedUserId = '';
+
+    // إعادة تعيين عناصر الصوت
+    if (this.localAudio) {
+      this.localAudio.nativeElement.srcObject = null;
+    }
+    if (this.remoteAudio) {
+      this.remoteAudio.nativeElement.srcObject = null;
+    }
+  }
 }

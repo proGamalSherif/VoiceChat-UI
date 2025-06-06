@@ -5,8 +5,8 @@
       <div class="h-100 d-flex flex-column align-items-start justify-content-center">
         <span class="mt-4 text-primary">{{RoomEntity.roomId}}</span>
         <span class="fs-5">{{RoomEntity.roomName}}
-          <div style="display: inline;" (click)="ShowOnlineUsers()"> <span class="online-users"
-              >({{UsersOnline}} Online)</span></div>
+          <div style="display: inline;" (click)="ShowOnlineUsers()"> <span class="online-users">({{UsersOnline}}
+              Online)</span></div>
         </span>
       </div>
     </div>
@@ -70,10 +70,12 @@
             </button>
           </div>
         </div>
+
+        }
+        }
+
         <audio #remoteAudio autoplay></audio>
         <audio #localAudio autoplay></audio>
-        }
-        }
         }
       </div>
     </div>
